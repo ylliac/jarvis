@@ -1,0 +1,8 @@
+
+// This grants all permissions to TalkingJava code and examples
+// - eg, if you want to run the examples.applet.BrowserApplet in a browser
+// by opening the examples/applet/browser.html file, include this.
+
+grant codeBase "file:C:/Program Files/CloudGarden/TalkingJava SDK/-" {
+	permission java.security.AllPermission;
+};
