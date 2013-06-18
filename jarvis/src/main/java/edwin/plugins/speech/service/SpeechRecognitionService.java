@@ -1,4 +1,4 @@
-package edwin.speech.service;
+package edwin.plugins.speech.service;
 
 import java.beans.PropertyVetoException;
 import java.util.HashSet;
@@ -14,7 +14,6 @@ import javax.speech.recognition.FinalRuleResult;
 import javax.speech.recognition.GrammarException;
 import javax.speech.recognition.Recognizer;
 import javax.speech.recognition.RecognizerProperties;
-import javax.speech.recognition.Result;
 import javax.speech.recognition.ResultEvent;
 import javax.speech.recognition.ResultListener;
 import javax.speech.recognition.ResultToken;
@@ -24,7 +23,7 @@ import javax.speech.recognition.SpeakerProfile;
 
 import org.apache.log4j.Logger;
 
-import edwin.core.config.GlobalConfiguration;
+import edwin.app.config.Configuration;
 import edwin.core.service.Service;
 
 public class SpeechRecognitionService implements Service, ResultListener {
@@ -32,19 +31,20 @@ public class SpeechRecognitionService implements Service, ResultListener {
 	private static final Logger LOGGER = Logger
 			.getLogger(SpeechRecognitionService.class);
 
-	private static SpeechRecognitionService s_Instance = null;
-
-	public static final synchronized SpeechRecognitionService getInstance() {
-		if (s_Instance == null) {
-			s_Instance = new SpeechRecognitionService();
-		}
-
-		return s_Instance;
+	public void ready() {
+		commitAndResume();
 	}
 
 	public synchronized void enable() {
 
 		try {
+
+			// TODO ACY DEBUG Choix du profile
+			// RecognizerModeDesc desc = new
+			// RecognizerModeDesc(null,Boolean.TRUE);
+			// SpeechEngineChooser chooser =
+			// SpeechEngineChooser.getRecognizerDialog(desc);
+			// chooser.show();
 
 			speechRecognizer = Central.createRecognizer(new EngineModeDesc(
 					Locale.ROOT));
@@ -125,16 +125,52 @@ public class SpeechRecognitionService implements Service, ResultListener {
 	}
 
 	public void addGrammar(String id, String grammar) {
+		String[] grammars = new String[]{ grammar};
+		addGrammar(id, grammars);
+	}
+	
+	public void addGrammar(String id, String[] grammars) {
 
 		Recognizer recognizer = getRecognizer();
 
 		try {
 			RuleGrammar newGrammar = recognizer.newRuleGrammar(id);
-			String name = GlobalConfiguration.getInstance().getName();
-			newGrammar.setRule(id,
-					newGrammar.ruleForJSGF(name + " " + grammar), true);
+			String name = Configuration.getInstance().getBotName();
+			for (String grammar : grammars) {
+				newGrammar.setRule(id,
+						newGrammar.ruleForJSGF(name + " " + grammar), true);				
+			}
 			newGrammar.setEnabled(true);
-			
+		} catch (IllegalArgumentException e) {
+			LOGGER.error(e, e);
+		} catch (NullPointerException e) {
+			LOGGER.error(e, e);
+		} catch (GrammarException e) {
+			LOGGER.error(e, e);
+		} catch (EngineStateError e) {
+			LOGGER.error(e, e);
+		}
+	}
+
+	public void pause() {
+
+		Recognizer recognizer = getRecognizer();
+
+		try {
+			recognizer.suspend();
+			recognizer.waitEngineState(Recognizer.SUSPENDED);
+		} catch (InterruptedException e) {
+			LOGGER.error(e, e);
+		} catch (EngineStateError e) {
+			LOGGER.error(e, e);
+		}
+	}
+
+	private void commitAndResume() {
+
+		Recognizer recognizer = getRecognizer();
+
+		try {
 			// Commit changes
 			recognizer.suspend();
 			recognizer.waitEngineState(Recognizer.SUSPENDED);
@@ -145,15 +181,11 @@ public class SpeechRecognitionService implements Service, ResultListener {
 			recognizer.waitEngineState(Recognizer.FOCUS_ON);
 			recognizer.resume();
 			recognizer.waitEngineState(Recognizer.RESUMED);
-		} catch (IllegalArgumentException e) {
-			LOGGER.error(e, e);
 		} catch (InterruptedException e) {
 			LOGGER.error(e, e);
-		} catch (NullPointerException e) {
+		} catch (AudioException e) {
 			LOGGER.error(e, e);
 		} catch (GrammarException e) {
-			LOGGER.error(e, e);
-		} catch (AudioException e) {
 			LOGGER.error(e, e);
 		} catch (EngineStateError e) {
 			LOGGER.error(e, e);
@@ -249,7 +281,7 @@ public class SpeechRecognitionService implements Service, ResultListener {
 			sentence = sentence.trim();
 
 			// Remove the name
-			String name = GlobalConfiguration.getInstance().getName();
+			String name = Configuration.getInstance().getBotName();
 			sentence = sentence.replaceFirst(name, "");
 			sentence = sentence.trim();
 

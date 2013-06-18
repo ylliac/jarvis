@@ -1,9 +1,10 @@
 package edwin.core.action;
 
-import edwin.common.VariableRepository;
+import edwin.app.Edwin;
+import edwin.core.variable.VariableRepository;
 
 public interface Action {
 	
-	void execute(VariableRepository localVars);
+	void execute(VariableRepository localVars, Edwin edwin);
 
 }

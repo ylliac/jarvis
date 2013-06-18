@@ -1,4 +1,4 @@
-package edwin.speech.service;
+package edwin.plugins.speech.service;
 
 import java.util.Locale;
 
@@ -20,16 +20,6 @@ public class SpeechService implements Service {
 
 	private static final Logger LOGGER = Logger.getLogger(SpeechService.class);
 
-	private static SpeechService s_Instance = null;
-	
-	public static final synchronized SpeechService getInstance(){
-		if(s_Instance == null){
-			s_Instance = new SpeechService();
-		}
-		
-		return s_Instance;
-	}
-	
 	public synchronized void enable() {
 
 		try {
@@ -44,8 +34,8 @@ public class SpeechService implements Service {
 			// .println("Can't find Swing - try using Java 2 to see the SpeechEngineChooser");
 			// }
 			// s_Synthesizer = Central.createSynthesizer(desc);
-			speechSynthesizer = Central.createSynthesizer(new SynthesizerModeDesc(
-					Locale.ROOT));
+			speechSynthesizer = Central
+					.createSynthesizer(new SynthesizerModeDesc(Locale.ROOT));
 
 			((com.cloudgarden.speech.CGEngineProperties) speechSynthesizer
 					.getSynthesizerProperties()).setEventsInNewThread(false);
@@ -53,8 +43,8 @@ public class SpeechService implements Service {
 			speechSynthesizer.allocate();
 			speechSynthesizer.waitEngineState(Synthesizer.ALLOCATED);
 
-			Voice v = new Voice(null, Voice.GENDER_DONT_CARE, Voice.AGE_DONT_CARE,
-					null);
+			Voice v = new Voice(null, Voice.GENDER_DONT_CARE,
+					Voice.AGE_DONT_CARE, null);
 
 			SynthesizerProperties properties = speechSynthesizer
 					.getSynthesizerProperties();
@@ -63,15 +53,15 @@ public class SpeechService implements Service {
 			properties.setSpeakingRate(200.0f);
 
 			LOGGER.debug("Using voice " + v);
-			
+
 		} catch (IllegalArgumentException e) {
 			LOGGER.error(e, e);
 		} catch (EngineException e) {
 			LOGGER.error(e, e);
 		} catch (EngineStateError e) {
-			LOGGER.error(e,e);
+			LOGGER.error(e, e);
 		} catch (InterruptedException e) {
-			LOGGER.error(e,e);
+			LOGGER.error(e, e);
 		}
 	}
 
@@ -90,6 +80,9 @@ public class SpeechService implements Service {
 		} catch (InterruptedException e) {
 			LOGGER.error(e, e);
 		}
+	}
+	
+	public void ready() {		
 	}
 
 	public void say(String message) {
@@ -129,7 +122,6 @@ public class SpeechService implements Service {
 
 		return speechSynthesizer;
 	}
-	
 
 	/**
 	 * Synthesizer.

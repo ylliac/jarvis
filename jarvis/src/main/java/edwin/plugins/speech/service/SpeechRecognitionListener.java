@@ -1,4 +1,4 @@
-package edwin.speech.service;
+package edwin.plugins.speech.service;
 
 public interface SpeechRecognitionListener {
 

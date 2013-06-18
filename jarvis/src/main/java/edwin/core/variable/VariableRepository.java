@@ -1,4 +1,6 @@
-package edwin.common;
+package edwin.core.variable;
+
+import edwin.common.RepositoryInMemory;
 
 public class VariableRepository extends RepositoryInMemory<String, Variable<?>> {
 

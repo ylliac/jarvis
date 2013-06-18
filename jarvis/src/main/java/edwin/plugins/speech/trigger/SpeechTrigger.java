@@ -1,29 +1,29 @@
-package edwin.speech.trigger;
+package edwin.plugins.speech.trigger;
 
-import edwin.common.Variable;
-import edwin.common.VariableRepository;
 import edwin.core.trigger.AbstractTrigger;
-import edwin.core.trigger.Trigger;
-import edwin.speech.service.SpeechRecognitionListener;
-import edwin.speech.service.SpeechRecognitionService;
+import edwin.core.variable.InternVariables;
+import edwin.core.variable.Variable;
+import edwin.core.variable.VariableRepository;
+import edwin.plugins.speech.service.SpeechRecognitionListener;
+import edwin.plugins.speech.service.SpeechRecognitionService;
 
 public class SpeechTrigger extends AbstractTrigger implements
 		SpeechRecognitionListener {
 
-	public SpeechTrigger(String pattern) {
-		this.pattern = pattern;
+	public SpeechTrigger(String... patterns) {
+		this.patterns = patterns;
 	}
 
-	public void enable() {
-		SpeechRecognitionService service = SpeechRecognitionService
-				.getInstance();
-		service.addGrammar(Long.toString(getId()), pattern);
+	protected void enableImpl() {
+		SpeechRecognitionService service = getEdwin().getService(
+				SpeechRecognitionService.class);
+		service.addGrammar(Long.toString(getId()), patterns);
 		service.addListener(this);
 	}
 
-	public void disable() {
-		SpeechRecognitionService service = SpeechRecognitionService
-				.getInstance();
+	protected void disableImpl() {
+		SpeechRecognitionService service = getEdwin().getService(
+				SpeechRecognitionService.class);
 		service.removeListener(this);
 		service.removeGrammar(Long.toString(getId()));
 	}
@@ -33,11 +33,6 @@ public class SpeechTrigger extends AbstractTrigger implements
 
 		if (Long.toString(getId()).equals(grammarName)) {
 			VariableRepository localVars = new VariableRepository();
-
-			// Set the command variable
-			Variable<String> commandVar = new Variable<String>(
-					Trigger.COMMAND_VARIABLE, sentence);
-			localVars.add(commandVar);
 
 			// Convert tags into variables
 			for (String tag : tags) {
@@ -66,10 +61,13 @@ public class SpeechTrigger extends AbstractTrigger implements
 				}
 			}
 
+			// Put the sentence in the last output
+			InternVariables.setOutput(localVars, sentence);
+
 			setTriggered(true, localVars);
 			setTriggered(false, localVars);
 		}
 	}
 
-	private String pattern;
+	private String[] patterns;
 }

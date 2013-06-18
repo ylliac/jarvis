@@ -1,4 +1,4 @@
-package edwin.common;
+package edwin.core.variable;
 
 public final class VariableUtilities {
 
@@ -30,8 +30,8 @@ public final class VariableUtilities {
 			// Get the value of the variable
 			Variable<?> variable = variables.findFromKey(varName);
 			if (variable == null) {
-				throw new IllegalArgumentException("Unknown variable "
-						+ varName);
+				//Put back the variable name
+				result += "%" + varName;
 			} else {
 				// Append the variable value
 				Object value = variable.getValue();

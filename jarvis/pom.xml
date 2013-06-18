@@ -13,6 +13,7 @@
 			<version>1.2.17</version>
 		</dependency>
 
+		<!-- SPEECH RECOGNITION & TEXT TO SPEECH -->
 		<dependency>
 			<groupId>cloudgarden</groupId>
 			<artifactId>talkingjava</artifactId>
@@ -20,7 +21,6 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/talkingjava-1.7.0/cgjsapi.jar</systemPath>
 		</dependency>
-
 		<!-- <dependency> -->
 		<!-- <groupId>cloudgarden</groupId> -->
 		<!-- <artifactId>talkingjava-cgjsapi170.dll</artifactId> -->
@@ -29,6 +29,42 @@
 		<!-- <type>dll</type> -->
 		<!-- <systemPath>${basedir}/lib/talkingjava-1.7.0/cgjsapi170.dll</systemPath> -->
 		<!-- </dependency> -->
+
+		<!-- TRANSLATE -->
+		<dependency>
+			<groupId>com.memetix</groupId>
+			<artifactId>microsoft-translator-java-api</artifactId>
+			<version>0.6.2</version>
+			<type>jar</type>
+		</dependency>
+
+		<!-- FREEBASE -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-freebase</artifactId>
+			<version>v1-rev37-1.15.0-rc</version>
+		</dependency>
+
+		<!-- JSON -->
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<version>0.8.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path-assert</artifactId>
+			<version>0.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- INI -->
+		<dependency>
+			<groupId>org.ini4j</groupId>
+			<artifactId>ini4j</artifactId>
+			<version>0.5.2</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

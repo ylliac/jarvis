@@ -1,16 +1,13 @@
 package edwin.core.trigger;
 
-public interface Trigger {
+import edwin.app.Edwin;
 
-	/**
-	 * Name of the local variable containing the trigger command text.
-	 */
-	String COMMAND_VARIABLE = "_command";
+public interface Trigger {
 	
 	/**
 	 * Enable the trigger.
 	 */
-	void enable();
+	void enable(Edwin edwin);
 
 	/**
 	 * Disable the trigger.
@@ -31,4 +28,9 @@ public interface Trigger {
 	 * Return wether the trigger is triggered or not.
 	 */
 	boolean isTriggered();
+	
+	/**
+	 * Get Edwin.
+	 */
+	Edwin getEdwin();
 }

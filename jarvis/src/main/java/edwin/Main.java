@@ -2,43 +2,90 @@ package edwin;
 
 import org.apache.log4j.Logger;
 
-import edwin.base.action.ShutdownAction;
+import edwin.app.Edwin;
 import edwin.core.rule.Rule;
-import edwin.speech.action.SpeechAction;
-import edwin.speech.service.SpeechRecognitionService;
-import edwin.speech.service.SpeechService;
-import edwin.speech.trigger.SpeechTrigger;
+import edwin.plugins.base.action.CurrentDateAction;
+import edwin.plugins.base.action.CurrentTimeAction;
+import edwin.plugins.base.action.PauseAction;
+import edwin.plugins.base.action.ReplaceInLastOutput;
+import edwin.plugins.base.action.ShutdownAction;
+import edwin.plugins.base.trigger.EdwinReadyTrigger;
+import edwin.plugins.freebase.action.SearchLastOutputInFreebase;
+import edwin.plugins.freebase.service.FreebaseService;
+import edwin.plugins.rivescript.action.BotReplyAction;
+import edwin.plugins.rivescript.trigger.BotTrigger;
+import edwin.plugins.speech.action.SayLastOutput;
+import edwin.plugins.speech.action.SpeechAction;
+import edwin.plugins.speech.trigger.SpeechTrigger;
+import edwin.plugins.translate.action.TranslateLastOutputFromFrenchToEnglish;
+import edwin.plugins.translate.service.TranslateService;
+import edwin.plugins.weather.action.GetWeatherAction;
+import edwin.plugins.weather.service.WeatherService;
 
 public class Main {
 
 	private static final Logger LOGGER = Logger.getLogger(Main.class);
-	
+
 	public static void main(String[] args) {
 
-		// Speech service
-		SpeechService speechService = SpeechService.getInstance();
-		speechService.enable();
+		// EDWIN : Create
+		Edwin edwin = new Edwin();
 
-		// Speech recognition service
-		SpeechRecognitionService speechRecognitionService = SpeechRecognitionService
-				.getInstance();
-		speechRecognitionService.enable();
+		// EDWIN : Services
+		edwin.addService(new TranslateService());
+		edwin.addService(new FreebaseService());
+		edwin.addService(new WeatherService());
 
-		// Rules
-		SpeechTrigger sayStopTrigger = new SpeechTrigger("stop");
-		ShutdownAction shutdownAction = new ShutdownAction();
-		Rule sayStop = new Rule("stop", sayStopTrigger, shutdownAction);
-		sayStop.enable();
-		
-		SpeechTrigger sayHelloTrigger = new SpeechTrigger(
-				"dis bonjour {text:vous avez dit}");
-		SpeechAction sayHelloAction = new SpeechAction("%text %_command");
-		Rule sayHello = new Rule("sayHello", sayHelloTrigger, sayHelloAction);
-		sayHello.enable();
-		
-		LOGGER.info("Ready");
+		// RULE : Ready --> "Bonjour"
+		edwin.addRule(new Rule("Hello", new EdwinReadyTrigger(),
+				new SpeechAction("Bonjour")));
 
-		speechRecognitionService.waitWhileEnabled();
+		// RULE : "Stop" --> Shutdown
+		edwin.addRule(new Rule("stop", new SpeechTrigger("stop"),
+				new SpeechAction("Au revoir"), new ShutdownAction()));
+
+		// RULE : Current time
+		edwin.addRule(new Rule("currentTime", new SpeechTrigger(
+				"Quelle heure il est", "Quelle heure est il"),
+				new CurrentTimeAction(), new SayLastOutput()));
+
+		// RULE : Current date
+		edwin.addRule(new Rule("currentDate", new SpeechTrigger(
+				"Quelle jour on est", "Quelle est la date d'aujourd'hui"),
+				new CurrentDateAction(), new SayLastOutput()));
+
+		// RULE : Say hello
+		edwin.addRule(new Rule("sayHello", new SpeechTrigger("dis bonjour"),
+				new SpeechAction("Bonjour")));
+
+		// RULE : RiveScript bot
+		edwin.addRule(new Rule("RiveScript", new BotTrigger(),
+				new BotReplyAction(), new SayLastOutput()));
+
+		// RULE : Pause
+		edwin.addRule(new Rule("Pause", new SpeechTrigger("Pause"),
+				new PauseAction()));
+
+		// RULE : Translate
+		edwin.addRule(new Rule("Translate", new SpeechTrigger(
+				"traduit <DICTATION>"),
+				new ReplaceInLastOutput("traduit ", ""),
+				new TranslateLastOutputFromFrenchToEnglish(),
+				new SayLastOutput()));
+
+		// RULE : Weather
+		edwin.addRule(new Rule("Weather", new SpeechTrigger(
+				"météo"),
+				new GetWeatherAction(3),
+				new SayLastOutput()));
+
+		// RULE : Search In Freebase
+		edwin.addRule(new Rule("Freebase", new SpeechTrigger(
+				"cherche Cee Lo Green"),
+				new ReplaceInLastOutput("cherche ", ""),
+				new SearchLastOutputInFreebase(), new SayLastOutput()));
+
+		// EDWIN : Start
+		edwin.start();
 	}
-
 }
