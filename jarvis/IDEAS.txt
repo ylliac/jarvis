@@ -1,0 +1,35 @@
+
+(OK) Quelle heure est il ?
+(OK) Date du jour
+(OK) Traduction anglais francais
+(OK) Chatbot
+
+
+(EN COURS) Intéroger FreeBase
+	-> "Quelle est la capitale de la France ?" - "Paris"
+
+Lire de la musique
+	-> "Musique Pink" - Lecture du dossier pink
+
+Stocker téléphones, anniversaires, etc. 
+	-> BDD entity - relationship ?
+	
+Météo
+
+Agenda :
+	--> Ajouter un RDV "Ajoute un rendez vous ..."
+	--> Rappeler les RDV de la journée
+	
+Ouvre un programme
+
+Chercher sur internet
+
+Calcul mathématique
+	--> "5 fois 10 plus 6" - "56"
+	
+Chercher une définition (wikipedia/wiktionnaire)
+	-> "Que veut dire sécure ?"
+	
+
+
+

@@ -2,10 +2,12 @@ package edwin.core.rule;
 
 import org.apache.log4j.Logger;
 
-import edwin.common.VariableRepository;
+import edwin.app.Edwin;
 import edwin.core.action.Action;
+import edwin.core.action.CompositeAction;
 import edwin.core.trigger.Trigger;
 import edwin.core.trigger.TriggerListener;
+import edwin.core.variable.VariableRepository;
 
 public class Rule implements TriggerListener {
 
@@ -16,26 +18,26 @@ public class Rule implements TriggerListener {
 		this.trigger = trigger;
 		this.action = action;
 	}
+	
+	public Rule(String name, Trigger trigger, Action... actions) {
+		this.name = name;
+		this.trigger = trigger;
+		CompositeAction compositeAction = new CompositeAction(actions);
+		this.action = compositeAction;
+	}
 
 	public void triggered(boolean triggered, VariableRepository localVars,
 			Trigger source) {
 		if (triggered && source == trigger) {
-
-			// Check if the command variable is set
-			if (localVars.findFromKey(Trigger.COMMAND_VARIABLE) == null) {
-				throw new IllegalStateException("Command variable ("
-						+ Trigger.COMMAND_VARIABLE
-						+ ") must be set by the trigger");
-			}
 			
 			LOGGER.info("Rule " + getName() + " triggered");
 
-			action.execute(localVars);
+			action.execute(localVars, trigger.getEdwin());
 		}
 	}
 
-	public void enable() {
-		trigger.enable();
+	public void enable(Edwin edwin) {
+		trigger.enable(edwin);
 		trigger.addListener(this);
 	}
 
